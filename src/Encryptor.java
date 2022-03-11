@@ -70,8 +70,22 @@ public class Encryptor
    */
   public String encryptMessage(String message)
   {
-    fillBlock(message);
-    return encryptBlock();
+    String newStr = "";
+    String temp = message;
+
+    while (temp.length() > 0) {
+      String substring = "";
+      if (temp.length() > numCols * numRows) {
+        substring = temp.substring(0, numRows * numCols);
+        temp = temp.substring(numCols * numRows);
+      } else {
+        substring = temp;
+        temp = "";
+      }
+      fillBlock(substring);
+      newStr += encryptBlock();
+    }
+    return newStr;
   }
   
   /**  Decrypts an encrypted message. All filler 'A's that may have been
@@ -98,6 +112,32 @@ public class Encryptor
    */
   public String decryptMessage(String encryptedMessage)
   {
-    return "";
+    int index = 0;
+    String temp = encryptedMessage;
+    String message = "";
+    while (index < encryptedMessage.length()) {
+      for (int col = 0; col < letterBlock[0].length; col++) {
+        for (int row = 0; row < letterBlock.length; row++) {
+          if (index < encryptedMessage.length()) {
+            letterBlock[row][col] = encryptedMessage.substring(index, index + 1);
+          }
+          index++;
+        }
+      }
+      for (String[] string : letterBlock) {
+        for (String x : string) {
+          message += x;
+        }
+      }
+    }
+    String previous = "";
+
+    for (int i = 1; i < message.length(); i++) {
+      previous = message.substring(i - 1, i);
+      if (previous.equals("A") && message.charAt(i) == 'A') {
+        message = message.substring(0, i - 1);
+      }
+    }
+    return message;
   }
 }
